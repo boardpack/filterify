@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Tuple, Type, Union
 from pydantic.main import BaseModel, ModelField
 
 from .filters import base as filters_base
+from .exceptions import UnknownFieldError
 
 
 __all__ = ['parse']
@@ -13,6 +14,7 @@ def parse(
     raw_qs: str,
     validation_model: Type[BaseModel],
     delimiter: str,
+    ignore_unknown_name: bool = True,
 ) -> Tuple[Dict[Tuple[str, str], Any], Dict[Tuple[str, str], Type[filters_base.Filter]]]:
     raw_result: Dict[Tuple[str, str], Any] = {}
     operations: Dict[Tuple[str, str], Type[filters_base.Filter]] = {}
@@ -29,11 +31,20 @@ def parse(
             operations[(raw_name, operation)] = filters_base.Equal
             continue
 
+        if delimiter not in raw_name:
+            if ignore_unknown_name:
+                continue
+
+            raise UnknownFieldError(raw_name)
+
         name, operation = raw_name.rsplit(delimiter, maxsplit=1)
 
         field = validation_model.__fields__.get(name)
         if not field:
-            raise ValueError(f'Filter name cannot be handled: {raw_name}')
+            if ignore_unknown_name:
+                continue
+
+            raise UnknownFieldError(raw_name)
 
         raw_result[(name, operation)] = value
         operations[(name, operation)] = _get_operation(operation, field)

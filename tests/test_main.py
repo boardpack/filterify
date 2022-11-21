@@ -4,6 +4,7 @@ import pytest
 from pydantic import BaseModel
 
 from filterify import Filterify
+from filterify.exceptions import UnknownFieldError
 
 
 @pytest.fixture
@@ -65,6 +66,8 @@ def user_model() -> Type[BaseModel]:
             {'field': ['age'], 'value': 10, 'operation': 'lte'},
             {'field': ['age'], 'value': 1, 'operation': 'gte'},
         ]),
+        ('unknown=10', []),
+        ('unknown__lte=10', []),
     ]
 )
 def test_model_filter(
@@ -117,3 +120,10 @@ def test_nested_model_2_level(
 
     model_filter = Filterify(Model)
     assert model_filter(query_params) == expected
+
+
+def test_unknown_field_name_exception(user_model: Type[BaseModel]):
+    model_filter = Filterify(user_model, ignore_unknown_name=False)
+
+    with pytest.raises(UnknownFieldError):
+        assert model_filter('unknown=10')

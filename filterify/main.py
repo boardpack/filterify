@@ -12,9 +12,11 @@ __all__ = ['Filterify']
 
 class Filterify:
     delimiter: str = '__'
+    ignore_unknown_name: bool = True
 
-    def __init__(self, model: Type[BaseModel], delimiter: Union[str, None] = None):
+    def __init__(self, model: Type[BaseModel], delimiter: Union[str, None] = None, ignore_unknown_name: bool = True):
         self.model = model
+        self.ignore_unknown_name = ignore_unknown_name
 
         if delimiter:
             self.delimiter = delimiter
@@ -22,7 +24,12 @@ class Filterify:
         self._validation_model = prepare_validation_model(self.model, self.delimiter)
 
     def __call__(self, raw_qs: str) -> List[Dict[str, Any]]:
-        data = parser.parse(raw_qs, self._validation_model, self.delimiter)
+        data = parser.parse(
+            raw_qs,
+            self._validation_model,
+            self.delimiter,
+            ignore_unknown_name=self.ignore_unknown_name,
+        )
         parsed_data: Dict[Tuple[str, str], Any] = data[0]
         operations: Dict[Tuple[str, str], Type[filters_base.Filter]] = data[1]
 
