@@ -13,9 +13,9 @@ def parse(
     raw_qs: str,
     validation_model: Type[BaseModel],
     delimiter: str,
-) -> Tuple[Dict[str, Any], Dict[str, Type[filters_base.Filter]]]:
-    raw_result: Dict[str, Any] = {}
-    operations: Dict[str, Type[filters_base.Filter]] = {}
+) -> Tuple[Dict[Tuple[str, str], Any], Dict[Tuple[str, str], Type[filters_base.Filter]]]:
+    raw_result: Dict[Tuple[str, str], Any] = {}
+    operations: Dict[Tuple[str, str], Type[filters_base.Filter]] = {}
 
     for raw_name, raw_value in parse_qs(raw_qs).items():
         if not raw_value:
@@ -24,8 +24,9 @@ def parse(
         value = _parse_list_or_value(raw_value[0])
 
         if raw_name in validation_model.__fields__:
-            raw_result[raw_name] = value
-            operations[raw_name] = filters_base.Equal
+            operation = filters_base.Equal.operation()
+            raw_result[(raw_name, operation)] = value
+            operations[(raw_name, operation)] = filters_base.Equal
             continue
 
         name, operation = raw_name.rsplit(delimiter, maxsplit=1)
@@ -34,8 +35,8 @@ def parse(
         if not field:
             raise ValueError(f'Filter name cannot be handled: {raw_name}')
 
-        raw_result[name] = value
-        operations[name] = _get_operation(operation, field)
+        raw_result[(name, operation)] = value
+        operations[(name, operation)] = _get_operation(operation, field)
 
     return raw_result, operations
 

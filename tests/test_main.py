@@ -61,6 +61,10 @@ def user_model() -> Type[BaseModel]:
         ('age__lt=10', [{'field': ['age'], 'value': 10, 'operation': 'lt'}]),
         ('age__gte=10', [{'field': ['age'], 'value': 10, 'operation': 'gte'}]),
         ('age__lte=10', [{'field': ['age'], 'value': 10, 'operation': 'lte'}]),
+        ('age__lte=10&age__gte=1', [
+            {'field': ['age'], 'value': 10, 'operation': 'lte'},
+            {'field': ['age'], 'value': 1, 'operation': 'gte'},
+        ]),
     ]
 )
 def test_model_filter(

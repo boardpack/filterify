@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Tuple, Type, Union
 
 from pydantic.main import BaseModel
 
@@ -23,12 +23,14 @@ class Filterify:
 
     def __call__(self, raw_qs: str) -> List[Dict[str, Any]]:
         data = parser.parse(raw_qs, self._validation_model, self.delimiter)
-        parsed_data: Dict[str, Any] = data[0]
-        operations: Dict[str, Type[filters_base.Filter]] = data[1]
+        parsed_data: Dict[Tuple[str, str], Any] = data[0]
+        operations: Dict[Tuple[str, str], Type[filters_base.Filter]] = data[1]
 
-        validated_data = self._validation_model(**parsed_data)
+        result: List[Dict[str, Any]] = []
+        for (field, operation_name), operation in operations.items():
+            validated_data = self._validation_model(**{field: parsed_data[(field, operation_name)]})
+            result.append(
+                operation(field=field, value=getattr(validated_data, field), delimiter=self.delimiter).value()
+            )
 
-        return [
-            operation(field=field, value=getattr(validated_data, field), delimiter=self.delimiter).value()
-            for field, operation in operations.items()
-        ]
+        return result
