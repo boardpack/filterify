@@ -1,16 +1,38 @@
 from collections import deque
 from typing import Any, Dict, Optional, Tuple, Type
 
-from pydantic.main import create_model, BaseModel, ModelMetaclass
+from pydantic import root_validator, create_model, BaseModel
+from pydantic.main import ModelMetaclass
 
 __all__ = ['prepare_validation_model']
+
+
+def _preprocess(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def _get_field_type(name: str):
+        field_type = cls.__fields__[name].outer_type_
+        if hasattr(field_type, '__origin__'):
+            return field_type.__origin__
+
+        return field_type
+
+    for field_name, value in values.items():
+        if issubclass(_get_field_type(field_name), list):
+            values[field_name] = [item.strip() for item in value.split(',')]
+
+    return values
 
 
 def prepare_validation_model(model: Type[BaseModel], delimiter: str) -> Type[BaseModel]:
     class OptionalFieldsModel(model, metaclass=AllOptionalMeta):
         pass
 
-    return create_model('InternalModel', **_prepare_field_definitions(OptionalFieldsModel, delimiter))
+    return create_model(
+        'InternalModel',
+        __validators__={
+            'preprocess': root_validator(pre=True, allow_reuse=True)(_preprocess),
+        },
+        **_prepare_field_definitions(OptionalFieldsModel, delimiter),
+    )
 
 
 def _prepare_field_definitions(model: Type[BaseModel], delimiter: str) -> Dict[str, Tuple[Any, None]]:

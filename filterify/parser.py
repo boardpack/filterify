@@ -1,5 +1,5 @@
 from urllib.parse import parse_qs
-from typing import Any, Dict, List, Tuple, Type, Union
+from typing import Any, Dict, Tuple, Type
 
 from pydantic.main import BaseModel, ModelField
 
@@ -23,7 +23,7 @@ def parse(
         if not raw_value:
             continue
 
-        value = _parse_list_or_value(raw_value[0])
+        value = raw_value[0]
 
         if raw_name in validation_model.__fields__:
             operation = filters_base.Equal.operation()
@@ -64,11 +64,3 @@ def _get_operation(operation: str, field: ModelField) -> Type[filters_base.Filte
             return filter_item
     else:
         raise ValueError(f'Unsupported operation for the {field_type}: {operation}')
-
-
-def _parse_list_or_value(value: str) -> Union[str, List[str]]:
-    list_delimiter = ','
-    if list_delimiter in value:
-        return value.split(list_delimiter)
-
-    return value
