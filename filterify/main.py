@@ -41,3 +41,7 @@ class Filterify:
             )
 
         return result
+
+    def as_dependency(self):
+        from .dependency import create_dependency
+        return create_dependency(self._validation_model)
