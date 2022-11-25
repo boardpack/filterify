@@ -57,7 +57,7 @@ def _get_operation(operation: str, field: ModelField) -> Type[filters_base.Filte
     if field.is_complex():
         field_type = field.outer_type_.__origin__
     if field_type not in filters_base.FILTER_MAPPING:
-        raise ValueError(f'Unsupported filter type: {field_type}')
+        raise ValueError(f'Unsupported field type: {field_type}')
 
     for filter_item in filters_base.FILTER_MAPPING[field_type]:
         if filter_item.operation() == operation:
