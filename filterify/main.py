@@ -13,15 +13,27 @@ __all__ = ['Filterify']
 class Filterify:
     delimiter: str = '__'
     ignore_unknown_name: bool = True
+    ordering: Union[bool, List[str]] = False
 
-    def __init__(self, model: Type[BaseModel], delimiter: Union[str, None] = None, ignore_unknown_name: bool = True):
+    def __init__(
+        self,
+        model: Type[BaseModel],
+        delimiter: Union[str, None] = None,
+        ignore_unknown_name: bool = True,
+        ordering: Union[bool, List[str]] = False,
+    ):
         self.model = model
         self.ignore_unknown_name = ignore_unknown_name
+        self.ordering = ordering
 
         if delimiter:
             self.delimiter = delimiter
 
-        self._validation_model = prepare_validation_model(self.model, self.delimiter)
+        self._validation_model = prepare_validation_model(
+            model=self.model,
+            delimiter=self.delimiter,
+            ordering=self.ordering,
+        )
 
     def __call__(self, raw_qs: str) -> List[Dict[str, Any]]:
         data = parser.parse(
