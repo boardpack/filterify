@@ -16,6 +16,8 @@ def _preprocess(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         return field_type
 
     for field_name, value in values.items():
+        if not value:
+            continue
         if issubclass(_get_field_type(field_name), list):
             values[field_name] = [item.strip() for item in value.split(',')]
 
