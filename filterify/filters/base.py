@@ -1,9 +1,10 @@
-from typing import Any
+from typing import Any, Dict, List, Type
 
 
 __all__ = [
     'Filter', 'Equal', 'NotEqual', 'GreaterThan', 'LessThan',
     'GreaterThanOrEqual', 'LessThanOrEqual', 'In', 'NotIn',
+    'register_base_filter',
 ]
 
 
@@ -102,10 +103,20 @@ class NotIn(Filter):
         return 'Not in'
 
 
-FILTER_MAPPING = {
-    int: (Equal, NotEqual, GreaterThan, LessThan, GreaterThanOrEqual, LessThanOrEqual, In, NotIn),
-    float: (Equal, NotEqual, GreaterThan, LessThan, GreaterThanOrEqual, LessThanOrEqual, In, NotIn),
-    bool: (Equal, NotEqual),
-    str: (Equal, NotEqual, In, NotIn),
-    list: (Equal, NotEqual, In, NotIn),
+FILTER_MAPPING: Dict[Any, List[Type[Filter]]] = {
+    int: [Equal, NotEqual, GreaterThan, LessThan, GreaterThanOrEqual, LessThanOrEqual, In, NotIn],
+    float: [Equal, NotEqual, GreaterThan, LessThan, GreaterThanOrEqual, LessThanOrEqual, In, NotIn],
+    bool: [Equal, NotEqual],
+    str: [Equal, NotEqual, In, NotIn],
+    list: [Equal, NotEqual, In, NotIn],
 }
+
+
+def register_base_filter(type_list: List[Any], *filters: Type[Filter]) -> None:
+    for type_ in type_list:
+        if type_ not in FILTER_MAPPING:
+            FILTER_MAPPING[type_] = []
+
+        for filter_ in filters:
+            if filter_ not in FILTER_MAPPING[type_]:
+                FILTER_MAPPING[type_].append(filter_)
