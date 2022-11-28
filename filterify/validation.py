@@ -1,27 +1,10 @@
 from collections import deque
-from typing import Any, Dict, List, Literal, Optional, Tuple, Type, Union
+from typing import Any, Dict, Deque, List, Literal, Optional, Tuple, Type, Union
 
 from pydantic import root_validator, create_model, BaseModel
-from pydantic.main import ModelMetaclass
+from pydantic.main import ModelMetaclass, ModelField
 
 __all__ = ['prepare_validation_model']
-
-
-def _preprocess(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-    def _get_field_type(name: str):
-        field_type = cls.__fields__[name].outer_type_
-        if hasattr(field_type, '__origin__'):
-            return field_type.__origin__
-
-        return field_type
-
-    for field_name, value in values.items():
-        if not value:
-            continue
-        if issubclass(_get_field_type(field_name), list):
-            values[field_name] = [item.strip() for item in value.split(',')]
-
-    return values
 
 
 def prepare_validation_model(
@@ -45,9 +28,46 @@ def prepare_validation_model(
     )
 
 
+class AllOptionalMeta(ModelMetaclass):
+    def __new__(mcs, name: str, bases: Tuple[type], namespaces: Dict[str, Any], **kwargs):
+        annotations: dict = namespaces.get('__annotations__', {})
+
+        for base in bases:
+            for base_ in base.__mro__:
+                if base_ is BaseModel:
+                    break
+
+                annotations.update(base_.__annotations__)
+
+        namespaces['__annotations__'] = {
+            field: value if field.startswith('__') else Optional[value]
+            for field, value in annotations.items()
+        }
+
+        return super().__new__(mcs, name, bases, namespaces, **kwargs)
+
+
+def _get_field_type(cls: Type[BaseModel], name: str):
+    field_type = cls.__fields__[name].outer_type_
+    if hasattr(field_type, '__origin__'):
+        return field_type.__origin__
+
+    return field_type
+
+
+def _preprocess(cls: Type[BaseModel], values: Dict[str, Any]) -> Dict[str, Any]:
+    for field_name, value in values.items():
+        if not value:
+            continue
+        if issubclass(_get_field_type(cls, field_name), list):
+            values[field_name] = [item.strip() for item in value.split(',')]
+
+    return values
+
+
 def _prepare_field_definitions(model: Type[BaseModel], delimiter: str) -> Dict[str, Tuple[Any, None]]:
     result: Dict[str, Tuple[Any, None]] = {}
-    q = deque([((name,), field) for name, field in model.__fields__.items()])
+    q: Deque[Tuple, ModelField] = deque([((name,), field) for name, field in model.__fields__.items()])
 
     while q:
         item: Tuple[Tuple[str, ...], Any] = q.popleft()
@@ -78,22 +98,3 @@ def _prepare_ordering_field(field_names: List[str], ordering: Union[bool, List[s
 
     result = tuple(accepted for name in accepted_field_names for accepted in (name, f'-{name}'))
     return List[Literal[result]], None
-
-
-class AllOptionalMeta(ModelMetaclass):
-    def __new__(mcs, name: str, bases: Tuple[type], namespaces: Dict[str, Any], **kwargs):
-        annotations: dict = namespaces.get('__annotations__', {})
-
-        for base in bases:
-            for base_ in base.__mro__:
-                if base_ is BaseModel:
-                    break
-
-                annotations.update(base_.__annotations__)
-
-        namespaces['__annotations__'] = {
-            field: value if field.startswith('__') else Optional[value]
-            for field, value in annotations.items()
-        }
-
-        return super().__new__(mcs, name, bases, namespaces, **kwargs)
