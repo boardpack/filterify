@@ -3,8 +3,9 @@ from typing import Any, Dict, List, Tuple, Type, Union
 from pydantic.main import BaseModel
 
 from . import parser
-from .validation import prepare_validation_model
+from .validation import DefaultValidator
 from .filters import base as filters_base
+from .protocols import ValidatorProtocol
 
 
 __all__ = ['Filterify']
@@ -21,6 +22,7 @@ class Filterify:
         delimiter: Union[str, None] = None,
         ignore_unknown_name: bool = True,
         ordering: Union[bool, List[str]] = False,
+        validator_class: Type[ValidatorProtocol] = DefaultValidator,
     ):
         self.model = model
         self.ignore_unknown_name = ignore_unknown_name
@@ -29,11 +31,8 @@ class Filterify:
         if delimiter:
             self.delimiter = delimiter
 
-        self._validation_model = prepare_validation_model(
-            model=self.model,
-            delimiter=self.delimiter,
-            ordering=self.ordering,
-        )
+        validator = validator_class(delimiter=self.delimiter, ordering=self.ordering)
+        self._validation_model = validator.parse(model)
 
     def __call__(self, raw_qs: str) -> List[Dict[str, Any]]:
         data = parser.parse(
