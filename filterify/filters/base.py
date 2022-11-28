@@ -1,4 +1,7 @@
+from abc import ABC
 from typing import Any, Dict, List, Type
+
+from filterify.protocols import FilterProtocol
 
 
 __all__ = [
@@ -8,7 +11,7 @@ __all__ = [
 ]
 
 
-class Filter:
+class Filter(FilterProtocol, ABC):
     def __init__(self, field: str, value: Any, delimiter: str):
         self._value = value
 
@@ -16,14 +19,7 @@ class Filter:
         if delimiter in field:
             self._field = field.split(delimiter)
 
-    @classmethod
-    def operation(cls) -> str:
-        raise NotImplementedError()
-
-    def name(self) -> str:
-        raise NotImplementedError()
-
-    def value(self):
+    def value(self) -> Any:
         return {
             'field': self._field,
             'value': self._value,

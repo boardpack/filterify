@@ -2,10 +2,9 @@ from typing import Any, Dict, List, Tuple, Type, Union
 
 from pydantic.main import BaseModel
 
-from . import parser
+from .parser import DefaultParser
 from .validation import DefaultValidator
-from .filters import base as filters_base
-from .protocols import ValidatorProtocol
+from .protocols import ValidatorProtocol, ParserProtocol, FilterProtocol
 
 
 __all__ = ['Filterify']
@@ -15,6 +14,8 @@ class Filterify:
     delimiter: str = '__'
     ignore_unknown_name: bool = True
     ordering: Union[bool, List[str]] = False
+    _validation_model: Type[BaseModel]
+    _parser: ParserProtocol
 
     def __init__(
         self,
@@ -23,6 +24,7 @@ class Filterify:
         ignore_unknown_name: bool = True,
         ordering: Union[bool, List[str]] = False,
         validator_class: Type[ValidatorProtocol] = DefaultValidator,
+        parser_class: Type[ParserProtocol] = DefaultParser,
     ):
         self.model = model
         self.ignore_unknown_name = ignore_unknown_name
@@ -33,16 +35,16 @@ class Filterify:
 
         validator = validator_class(delimiter=self.delimiter, ordering=self.ordering)
         self._validation_model = validator.parse(model)
-
-    def __call__(self, raw_qs: str) -> List[Dict[str, Any]]:
-        data = parser.parse(
-            raw_qs,
-            self._validation_model,
-            self.delimiter,
+        self._parser = parser_class(
+            validation_model=self._validation_model,
+            delimiter=self.delimiter,
             ignore_unknown_name=self.ignore_unknown_name,
         )
+
+    def __call__(self, raw_qs: str) -> List[Dict[str, Any]]:
+        data = self._parser.parse(raw_qs)
         parsed_data: Dict[Tuple[str, str], Any] = data[0]
-        filters: Dict[Tuple[str, str], Type[filters_base.Filter]] = data[1]
+        filters: Dict[Tuple[str, str], Type[FilterProtocol]] = data[1]
 
         result: List[Dict[str, Any]] = []
         for (field, operation), filter_class in filters.items():
