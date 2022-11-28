@@ -71,13 +71,13 @@ def _prepare_field_definitions(model: Type[BaseModel], delimiter: str) -> Dict[s
     return result
 
 
-def _prepare_ordering_field(field_names: List[str], ordering: Union[bool, List[str]]):
+def _prepare_ordering_field(field_names: List[str], ordering: Union[bool, List[str]]) -> Tuple[Type, None]:
     accepted_field_names = field_names
     if isinstance(ordering, list):
         accepted_field_names = [name for name in field_names if name in ordering]
 
-    allowed_field_names = (allowed for name in accepted_field_names for allowed in (name, f'-{name}'))
-    return List[Literal[tuple(allowed_field_names)]], None
+    result = tuple(accepted for name in accepted_field_names for accepted in (name, f'-{name}'))
+    return List[Literal[result]], None
 
 
 class AllOptionalMeta(ModelMetaclass):
