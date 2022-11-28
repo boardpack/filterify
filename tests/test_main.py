@@ -1,4 +1,4 @@
-from typing import Any, Type, Dict, List
+from typing import Any, Dict, List, Type
 
 import pytest
 from pydantic import BaseModel
@@ -19,55 +19,71 @@ def user_model() -> Type[BaseModel]:
 
 
 @pytest.mark.parametrize(
-    'query_params, expected', [
+    "query_params, expected",
+    [
         (
-            'name=John&age=10',
+            "name=John&age=10",
             [
-                {'field': ['name'], 'value': 'John', 'operation': 'eq'},
-                {'field': ['age'], 'value': 10, 'operation': 'eq'},
+                {"field": ["name"], "value": "John", "operation": "eq"},
+                {"field": ["age"], "value": 10, "operation": "eq"},
             ],
         ),
-        ('height=150.5', [{'field': ['height'], 'value': 150.5, 'operation': 'eq'}]),
-        ('colors=blue,red,green', [{'field': ['colors'], 'value': ['blue', 'red', 'green'], 'operation': 'eq'}]),
+        ("height=150.5", [{"field": ["height"], "value": 150.5, "operation": "eq"}]),
         (
-            'name=John&age=10&height=150.5&colors=blue,red,green',
+            "colors=blue,red,green",
             [
                 {
-                    'field': ['name'],
-                    'value': 'John',
-                    'operation': 'eq',
+                    "field": ["colors"],
+                    "value": ["blue", "red", "green"],
+                    "operation": "eq",
+                }
+            ],
+        ),
+        (
+            "name=John&age=10&height=150.5&colors=blue,red,green",
+            [
+                {
+                    "field": ["name"],
+                    "value": "John",
+                    "operation": "eq",
                 },
                 {
-                    'field': ['age'],
-                    'value': 10,
-                    'operation': 'eq',
+                    "field": ["age"],
+                    "value": 10,
+                    "operation": "eq",
                 },
                 {
-                    'field': ['height'],
-                    'value': 150.5,
-                    'operation': 'eq',
+                    "field": ["height"],
+                    "value": 150.5,
+                    "operation": "eq",
                 },
                 {
-                    'field': ['colors'],
-                    'value': ['blue', 'red', 'green'],
-                    'operation': 'eq',
+                    "field": ["colors"],
+                    "value": ["blue", "red", "green"],
+                    "operation": "eq",
                 },
             ],
         ),
-        ('name__ne=John', [{'field': ['name'], 'value': 'John', 'operation': 'ne'}]),
-        ('height__ne=150.5', [{'field': ['height'], 'value': 150.5, 'operation': 'ne'}]),
-        ('age__ne=10', [{'field': ['age'], 'value': 10, 'operation': 'ne'}]),
-        ('age__gt=10', [{'field': ['age'], 'value': 10, 'operation': 'gt'}]),
-        ('age__lt=10', [{'field': ['age'], 'value': 10, 'operation': 'lt'}]),
-        ('age__gte=10', [{'field': ['age'], 'value': 10, 'operation': 'gte'}]),
-        ('age__lte=10', [{'field': ['age'], 'value': 10, 'operation': 'lte'}]),
-        ('age__lte=10&age__gte=1', [
-            {'field': ['age'], 'value': 10, 'operation': 'lte'},
-            {'field': ['age'], 'value': 1, 'operation': 'gte'},
-        ]),
-        ('unknown=10', []),
-        ('unknown__lte=10', []),
-    ]
+        ("name__ne=John", [{"field": ["name"], "value": "John", "operation": "ne"}]),
+        (
+            "height__ne=150.5",
+            [{"field": ["height"], "value": 150.5, "operation": "ne"}],
+        ),
+        ("age__ne=10", [{"field": ["age"], "value": 10, "operation": "ne"}]),
+        ("age__gt=10", [{"field": ["age"], "value": 10, "operation": "gt"}]),
+        ("age__lt=10", [{"field": ["age"], "value": 10, "operation": "lt"}]),
+        ("age__gte=10", [{"field": ["age"], "value": 10, "operation": "gte"}]),
+        ("age__lte=10", [{"field": ["age"], "value": 10, "operation": "lte"}]),
+        (
+            "age__lte=10&age__gte=1",
+            [
+                {"field": ["age"], "value": 10, "operation": "lte"},
+                {"field": ["age"], "value": 1, "operation": "gte"},
+            ],
+        ),
+        ("unknown=10", []),
+        ("unknown__lte=10", []),
+    ],
 )
 def test_model_filter(
     user_model: Type[BaseModel],
@@ -79,12 +95,13 @@ def test_model_filter(
 
 
 @pytest.mark.parametrize(
-    'query_params, expected', [
+    "query_params, expected",
+    [
         (
-            'user__age__lte=10',
-            [{'field': ['user', 'age'], 'value': 10, 'operation': 'lte'}],
+            "user__age__lte=10",
+            [{"field": ["user", "age"], "value": 10, "operation": "lte"}],
         ),
-    ]
+    ],
 )
 def test_nested_model(
     user_model: Type[BaseModel],
@@ -99,12 +116,13 @@ def test_nested_model(
 
 
 @pytest.mark.parametrize(
-    'query_params, expected', [
+    "query_params, expected",
+    [
         (
-            'data__user__age__lte=10',
-            [{'field': ['data', 'user', 'age'], 'value': 10, 'operation': 'lte'}],
+            "data__user__age__lte=10",
+            [{"field": ["data", "user", "age"], "value": 10, "operation": "lte"}],
         ),
-    ]
+    ],
 )
 def test_nested_model_2_level(
     user_model: Type[BaseModel],
@@ -125,4 +143,4 @@ def test_unknown_field_name_exception(user_model: Type[BaseModel]):
     model_filter = Filterify(user_model, ignore_unknown_name=False)
 
     with pytest.raises(UnknownFieldError):
-        assert model_filter('unknown=10')
+        assert model_filter("unknown=10")

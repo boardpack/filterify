@@ -1,25 +1,21 @@
-from urllib.parse import parse_qs
 from typing import Any, Dict, Tuple, Type
+from urllib.parse import parse_qs
 
-from pydantic.main import BaseModel, ModelField
+from pydantic.fields import ModelField
 
-from .protocols import ParserProtocol, FilterProtocol
-from .filters import base as filters_base
+from .base import Filter, Parser
 from .exceptions import UnknownFieldError
+from .filters import base as filters_base
+
+__all__ = ["DefaultParser"]
 
 
-__all__ = ['DefaultParser']
-
-
-class DefaultParser(ParserProtocol):
-    def __init__(self, validation_model: Type[BaseModel], delimiter: str, ignore_unknown_name: bool = True):
-        self.validation_model = validation_model
-        self.delimiter = delimiter
-        self.ignore_unknown_name = ignore_unknown_name
-
-    def parse(self, raw_qs: str) -> Tuple[Dict[Tuple[str, str], Any], Dict[Tuple[str, str], Type[FilterProtocol]]]:
+class DefaultParser(Parser):
+    def parse(
+        self, raw_qs: str
+    ) -> Tuple[Dict[Tuple[str, str], Any], Dict[Tuple[str, str], Type[Filter]]]:
         raw_result: Dict[Tuple[str, str], Any] = {}
-        operations: Dict[Tuple[str, str], Type[FilterProtocol]] = {}
+        operations: Dict[Tuple[str, str], Type[Filter]] = {}
 
         for raw_name, raw_value in parse_qs(raw_qs).items():
             if not raw_value:
@@ -54,15 +50,15 @@ class DefaultParser(ParserProtocol):
         return raw_result, operations
 
     @staticmethod
-    def _get_filter(operation: str, field: ModelField) -> Type[FilterProtocol]:
+    def _get_filter(operation: str, field: ModelField) -> Type[Filter]:
         field_type = field.outer_type_
         if field.is_complex():
             field_type = field.outer_type_.__origin__
         if field_type not in filters_base.FILTER_MAPPING:
-            raise ValueError(f'Unsupported field type: {field_type}')
+            raise ValueError(f"Unsupported field type: {field_type}")
 
         for filter_item in filters_base.FILTER_MAPPING[field_type]:
             if filter_item.operation() == operation:
                 return filter_item
         else:
-            raise ValueError(f'Unsupported operation for the {field_type}: {operation}')
+            raise ValueError(f"Unsupported operation for the {field_type}: {operation}")
