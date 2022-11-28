@@ -43,14 +43,13 @@ class Filterify:
             ignore_unknown_name=self.ignore_unknown_name,
         )
         parsed_data: Dict[Tuple[str, str], Any] = data[0]
-        operations: Dict[Tuple[str, str], Type[filters_base.Filter]] = data[1]
+        filters: Dict[Tuple[str, str], Type[filters_base.Filter]] = data[1]
 
         result: List[Dict[str, Any]] = []
-        for (field, operation_name), operation in operations.items():
-            validated_data = self._validation_model(**{field: parsed_data[(field, operation_name)]})
-            result.append(
-                operation(field=field, value=getattr(validated_data, field), delimiter=self.delimiter).value()
-            )
+        for (field, operation), filter_class in filters.items():
+            validated_data = self._validation_model(**{field: parsed_data[(field, operation)]})
+            field_filter = filter_class(field=field, value=getattr(validated_data, field), delimiter=self.delimiter)
+            result.append(field_filter.value())
 
         return result
 
