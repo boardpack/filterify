@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import Any, Dict, List, Literal, Optional, Tuple, Type, Union
 
 from pydantic import root_validator, create_model, BaseModel
 from pydantic.main import ModelMetaclass
@@ -24,16 +24,24 @@ def _preprocess(cls, values: Dict[str, Any]) -> Dict[str, Any]:
     return values
 
 
-def prepare_validation_model(model: Type[BaseModel], delimiter: str) -> Type[BaseModel]:
+def prepare_validation_model(
+    model: Type[BaseModel],
+    delimiter: str,
+    ordering: Union[bool, List[str]]
+) -> Type[BaseModel]:
     class OptionalFieldsModel(model, metaclass=AllOptionalMeta):
         pass
+
+    fields: Dict[str, Tuple[Any, None]] = _prepare_field_definitions(OptionalFieldsModel, delimiter)
+    if ordering:
+        fields['ordering'] = _prepare_ordering_field(list(fields), ordering)
 
     return create_model(
         'InternalModel',
         __validators__={
             'preprocess': root_validator(pre=True, allow_reuse=True)(_preprocess),
         },
-        **_prepare_field_definitions(OptionalFieldsModel, delimiter),
+        **fields,
     )
 
 
@@ -61,6 +69,15 @@ def _prepare_field_definitions(model: Type[BaseModel], delimiter: str) -> Dict[s
         result[delimiter.join(name)] = field.outer_type_, None
 
     return result
+
+
+def _prepare_ordering_field(field_names: List[str], ordering: Union[bool, List[str]]) -> Tuple[Type, None]:
+    accepted_field_names = field_names
+    if isinstance(ordering, list):
+        accepted_field_names = [name for name in field_names if name in ordering]
+
+    result = tuple(accepted for name in accepted_field_names for accepted in (name, f'-{name}'))
+    return List[Literal[result]], None
 
 
 class AllOptionalMeta(ModelMetaclass):
