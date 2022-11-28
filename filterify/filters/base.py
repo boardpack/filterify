@@ -6,7 +6,7 @@ from filterify.protocols import FilterProtocol
 
 __all__ = [
     'Filter', 'EqualFilter', 'NotEqualFilter', 'GreaterThanFilter', 'LessThanFilter',
-    'GreaterThanOrEqualFilter', 'LessThanOrEqualFilter', 'InFilter', 'NotInFilter',
+    'GreaterThanOrEqualFilter', 'LessThanOrEqualFilter',
 ]
 
 
@@ -80,34 +80,34 @@ class LessThanOrEqualFilter(Filter):
         return 'Less than or equal'
 
 
-class InFilter(Filter):
+class LikeFilter(Filter):
     @classmethod
     def operation(cls) -> str:
-        return 'in'
+        return 'contains'
 
     def name(self) -> str:
-        return 'In'
+        return 'Like'
 
 
-class NotInFilter(Filter):
+class NotLikeFilter(Filter):
     @classmethod
     def operation(cls) -> str:
-        return 'not_in'
+        return 'not_contains'
 
     def name(self) -> str:
-        return 'Not in'
+        return 'Not like'
 
 
 FILTER_MAPPING: Dict[Any, List[Type[Filter]]] = {
     int: [
         EqualFilter, NotEqualFilter, GreaterThanFilter, LessThanFilter, GreaterThanOrEqualFilter,
-        LessThanOrEqualFilter, InFilter, NotInFilter,
+        LessThanOrEqualFilter,
     ],
     float: [
         EqualFilter, NotEqualFilter, GreaterThanFilter, LessThanFilter, GreaterThanOrEqualFilter,
-        LessThanOrEqualFilter, InFilter, NotInFilter,
+        LessThanOrEqualFilter,
     ],
     bool: [EqualFilter, NotEqualFilter],
-    str: [EqualFilter, NotEqualFilter, InFilter, NotInFilter],
-    list: [EqualFilter, NotEqualFilter, InFilter, NotInFilter],
+    str: [EqualFilter, NotEqualFilter, LikeFilter, NotLikeFilter],
+    list: [EqualFilter, NotEqualFilter],
 }

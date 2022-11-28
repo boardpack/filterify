@@ -29,7 +29,6 @@ def user_model() -> Type[BaseModel]:
         ),
         ('height=150.5', [{'field': ['height'], 'value': 150.5, 'operation': 'eq'}]),
         ('colors=blue,red,green', [{'field': ['colors'], 'value': ['blue', 'red', 'green'], 'operation': 'eq'}]),
-        ('colors__in=blue,red,green', [{'field': ['colors'], 'value': ['blue', 'red', 'green'], 'operation': 'in'}]),
         (
             'name=John&age=10&height=150.5&colors=blue,red,green',
             [
