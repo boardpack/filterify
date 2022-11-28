@@ -7,7 +7,6 @@ from filterify.protocols import FilterProtocol
 __all__ = [
     'Filter', 'EqualFilter', 'NotEqualFilter', 'GreaterThanFilter', 'LessThanFilter',
     'GreaterThanOrEqualFilter', 'LessThanOrEqualFilter', 'InFilter', 'NotInFilter',
-    'register_base_filter',
 ]
 
 
@@ -112,13 +111,3 @@ FILTER_MAPPING: Dict[Any, List[Type[Filter]]] = {
     str: [EqualFilter, NotEqualFilter, InFilter, NotInFilter],
     list: [EqualFilter, NotEqualFilter, InFilter, NotInFilter],
 }
-
-
-def register_base_filter(type_list: List[Any], *filters: Type[Filter]) -> None:
-    for type_ in type_list:
-        if type_ not in FILTER_MAPPING:
-            FILTER_MAPPING[type_] = []
-
-        for filter_ in filters:
-            if filter_ not in FILTER_MAPPING[type_]:
-                FILTER_MAPPING[type_].append(filter_)
