@@ -49,6 +49,7 @@ test = [
     "flake8 ==6.0.0",
     "black ==22.10.0",
     "isort ==5.10.1",
+    "fastapi",
 ]
 dev = [
     "autoflake ==2.0.0",
