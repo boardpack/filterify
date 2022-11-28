@@ -53,7 +53,7 @@ def test_custom_type(refresh_filter_types: None, custom_type: Type):
     class User(BaseModel):
         name: custom_type
 
-    register_base_filter([custom_type], filters_base.Equal)
+    register_base_filter([custom_type], filters_base.EqualFilter)
 
     model_filter = Filterify(User)
     assert model_filter('name=15') == [{'field': ['name'], 'value': 15, 'operation': 'eq'}]

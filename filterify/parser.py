@@ -26,9 +26,9 @@ def parse(
         value = raw_value[0]
 
         if raw_name in validation_model.__fields__:
-            operation = filters_base.Equal.operation()
+            operation = filters_base.EqualFilter.operation()
             raw_result[(raw_name, operation)] = value
-            operations[(raw_name, operation)] = filters_base.Equal
+            operations[(raw_name, operation)] = filters_base.EqualFilter
             continue
 
         if delimiter not in raw_name:

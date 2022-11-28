@@ -2,8 +2,8 @@ from typing import Any, Dict, List, Type
 
 
 __all__ = [
-    'Filter', 'Equal', 'NotEqual', 'GreaterThan', 'LessThan',
-    'GreaterThanOrEqual', 'LessThanOrEqual', 'In', 'NotIn',
+    'Filter', 'EqualFilter', 'NotEqualFilter', 'GreaterThanFilter', 'LessThanFilter',
+    'GreaterThanOrEqualFilter', 'LessThanOrEqualFilter', 'InFilter', 'NotInFilter',
     'register_base_filter',
 ]
 
@@ -31,7 +31,7 @@ class Filter:
         }
 
 
-class Equal(Filter):
+class EqualFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'eq'
@@ -40,7 +40,7 @@ class Equal(Filter):
         return 'Equals'
 
 
-class NotEqual(Filter):
+class NotEqualFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'ne'
@@ -49,7 +49,7 @@ class NotEqual(Filter):
         return 'Not Equals'
 
 
-class GreaterThan(Filter):
+class GreaterThanFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'gt'
@@ -58,7 +58,7 @@ class GreaterThan(Filter):
         return 'Greater than'
 
 
-class LessThan(Filter):
+class LessThanFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'lt'
@@ -67,7 +67,7 @@ class LessThan(Filter):
         return 'Less than'
 
 
-class GreaterThanOrEqual(Filter):
+class GreaterThanOrEqualFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'gte'
@@ -76,7 +76,7 @@ class GreaterThanOrEqual(Filter):
         return 'Greater than or equal'
 
 
-class LessThanOrEqual(Filter):
+class LessThanOrEqualFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'lte'
@@ -85,7 +85,7 @@ class LessThanOrEqual(Filter):
         return 'Less than or equal'
 
 
-class In(Filter):
+class InFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'in'
@@ -94,7 +94,7 @@ class In(Filter):
         return 'In'
 
 
-class NotIn(Filter):
+class NotInFilter(Filter):
     @classmethod
     def operation(cls) -> str:
         return 'not_in'
@@ -104,11 +104,17 @@ class NotIn(Filter):
 
 
 FILTER_MAPPING: Dict[Any, List[Type[Filter]]] = {
-    int: [Equal, NotEqual, GreaterThan, LessThan, GreaterThanOrEqual, LessThanOrEqual, In, NotIn],
-    float: [Equal, NotEqual, GreaterThan, LessThan, GreaterThanOrEqual, LessThanOrEqual, In, NotIn],
-    bool: [Equal, NotEqual],
-    str: [Equal, NotEqual, In, NotIn],
-    list: [Equal, NotEqual, In, NotIn],
+    int: [
+        EqualFilter, NotEqualFilter, GreaterThanFilter, LessThanFilter, GreaterThanOrEqualFilter,
+        LessThanOrEqualFilter, InFilter, NotInFilter,
+    ],
+    float: [
+        EqualFilter, NotEqualFilter, GreaterThanFilter, LessThanFilter, GreaterThanOrEqualFilter,
+        LessThanOrEqualFilter, InFilter, NotInFilter,
+    ],
+    bool: [EqualFilter, NotEqualFilter],
+    str: [EqualFilter, NotEqualFilter, InFilter, NotInFilter],
+    list: [EqualFilter, NotEqualFilter, InFilter, NotInFilter],
 }
 
 
