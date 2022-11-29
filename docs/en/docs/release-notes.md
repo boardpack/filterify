@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* ⬆ Bump actions/upload-artifact from 2 to 3. PR [#16](https://github.com/boardpack/filterify/pull/16) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump nwtgck/actions-netlify from 1.1.5 to 1.2.4. PR [#15](https://github.com/boardpack/filterify/pull/15) by [@dependabot[bot]](https://github.com/apps/dependabot).
 
 ## 0.0.1
