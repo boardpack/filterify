@@ -4,7 +4,7 @@ from urllib.parse import parse_qs
 from pydantic.fields import ModelField
 
 from .base import Filter, Parser
-from .exceptions import UnknownFieldError
+from .exceptions import UnknownFieldError, UnknownOperationError, UnknownTypeError
 from .filters import base as filters_base
 
 __all__ = ["DefaultParser"]
@@ -21,44 +21,40 @@ class DefaultParser(Parser):
             if not raw_value:
                 continue
 
+            name, operation = raw_name, filters_base.EqualFilter.operation()
+            if name not in self.validation_model.__fields__:
+                if self.delimiter in name:
+                    name, operation = name.rsplit(self.delimiter, maxsplit=1)
+
+                if name not in self.validation_model.__fields__:
+                    if self.ignore_unknown_name:
+                        continue
+
+                    raise UnknownFieldError(raw_name)
+
             value = raw_value[0]
-
-            if raw_name in self.validation_model.__fields__:
-                operation = filters_base.EqualFilter.operation()
-                raw_result[(raw_name, operation)] = value
-                operations[(raw_name, operation)] = filters_base.EqualFilter
-                continue
-
-            if self.delimiter not in raw_name:
-                if self.ignore_unknown_name:
-                    continue
-
-                raise UnknownFieldError(raw_name)
-
-            name, operation = raw_name.rsplit(self.delimiter, maxsplit=1)
-
-            field = self.validation_model.__fields__.get(name)
-            if not field:
-                if self.ignore_unknown_name:
-                    continue
-
-                raise UnknownFieldError(raw_name)
+            field = self.validation_model.__fields__[name]
+            field_type = self._get_field_type(field)
 
             raw_result[(name, operation)] = value
-            operations[(name, operation)] = self._get_filter(operation, field)
+            operations[(name, operation)] = self._get_filter(operation, field_type)
 
         return raw_result, operations
 
     @staticmethod
-    def _get_filter(operation: str, field: ModelField) -> Type[Filter]:
-        field_type = field.outer_type_
+    def _get_field_type(field: ModelField) -> Any:
+        result = field.outer_type_
         if field.is_complex():
-            field_type = field.outer_type_.__origin__
-        if field_type not in filters_base.FILTER_MAPPING:
-            raise ValueError(f"Unsupported field type: {field_type}")
+            result = field.outer_type_.__origin__
+        if result not in filters_base.FILTER_MAPPING:
+            raise UnknownTypeError(result)
 
+        return result
+
+    @staticmethod
+    def _get_filter(operation: str, field_type: Any) -> Type[Filter]:
         for filter_item in filters_base.FILTER_MAPPING[field_type]:
             if filter_item.operation() == operation:
                 return filter_item
         else:
-            raise ValueError(f"Unsupported operation for the {field_type}: {operation}")
+            raise UnknownOperationError(field_type, operation)

@@ -4,7 +4,11 @@ import pytest
 from pydantic import BaseModel
 
 from filterify import Filterify
-from filterify.exceptions import UnknownFieldError
+from filterify.exceptions import (
+    UnknownFieldError,
+    UnknownOperationError,
+    UnknownTypeError,
+)
 
 
 @pytest.fixture
@@ -139,8 +143,29 @@ def test_nested_model_2_level(
     assert model_filter(query_params) == expected
 
 
-def test_unknown_field_name_exception(user_model: Type[BaseModel]):
+def test_unknown_field_name_ignore_default(user_model: Type[BaseModel]):
+    Filterify(user_model)("unknown=10")
+
+
+def test_unknown_field_name(user_model: Type[BaseModel]):
     model_filter = Filterify(user_model, ignore_unknown_name=False)
 
     with pytest.raises(UnknownFieldError):
         assert model_filter("unknown=10")
+
+
+def test_unknown_field_type(user_model: Type[BaseModel]):
+    class MyModel(user_model):
+        example: Dict[str, str]
+
+    model_filter = Filterify(MyModel, ignore_unknown_name=False)
+
+    with pytest.raises(UnknownTypeError):
+        assert model_filter("example=10")
+
+
+def test_unknown_field_operation(user_model: Type[BaseModel]):
+    model_filter = Filterify(user_model)
+
+    with pytest.raises(UnknownOperationError):
+        assert model_filter("name__unknown=10")
