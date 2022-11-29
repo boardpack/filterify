@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* 📝 Update README.md. PR [#14](https://github.com/boardpack/filterify/pull/14) by [@dukkee](https://github.com/dukkee).
 * 📝 Add docs and examples. PR [#13](https://github.com/boardpack/filterify/pull/13) by [@dukkee](https://github.com/dukkee).
 * 🔨 Refactor parser. PR [#12](https://github.com/boardpack/filterify/pull/12) by [@dukkee](https://github.com/dukkee).
 * 💄 Update logos. PR [#11](https://github.com/boardpack/filterify/pull/11) by [@dukkee](https://github.com/dukkee).
