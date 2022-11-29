@@ -30,6 +30,10 @@
 
 Python 3.8+
 
+filterify has the next dependencies:
+
+* <a href="https://pydantic-docs.helpmanual.io/" class="external-link" target="_blank">Pydantic</a>
+
 ## Installation
 
 <div class="termy">
@@ -41,6 +45,221 @@ $ pip install filterify
 ```
 
 </div>
+
+## First steps
+
+To start to work with filterify, you just need to have some Pydantic model you want to have as filters.
+
+Let's define simple `Address` and `Shipment` models. Then just pass the `Shipment` model to the `Filterify` constructor
+and you will get a callable object to parse query params. By default, the parser returns a dictionary structure with
+the parsing results.
+
+```Python  hl_lines="18 20"
+from pydantic import BaseModel
+from filterify import Filterify
+
+
+class Address(BaseModel):
+    street: str
+    city: str
+    country: str
+
+
+class Shipment(BaseModel):
+    name: str
+    sender: Address
+    recipient: Address
+    weight: float
+
+
+model_filter = Filterify(Shipment)
+
+print(model_filter('name=shoes&sender__country=US&recipient__country__ne=CA'))
+# [
+#     {
+#         'field': [
+#             'name'
+#         ],
+#         'value': 'shoes',
+#         'operation': 'eq'
+#     },
+#     {
+#         'field': [
+#             'sender',
+#             'country'
+#         ],
+#         'value': 'US',
+#         'operation': 'eq'
+#     },
+#     {
+#         'field': [
+#             'recipient',
+#             'country'
+#         ],
+#         'value': 'CA',
+#         'operation': 'ne'
+#     }
+# ]
+
+```
+_(This script is complete, it should run "as is")_
+
+Filterify supports nested models and uses `__` as a delimiter for the nested models and operations. If you want to
+change it, pass the needed `delimiter` to the constructor as it's shown in the next example.
+
+```Python  hl_lines="13"
+from pydantic import BaseModel
+from filterify import Filterify
+
+
+class Address(BaseModel):
+    country: str
+
+
+class Shipment(BaseModel):
+    sender: Address
+
+
+model_filter = Filterify(Shipment, delimiter='$')
+
+print(model_filter('sender$country$ne=US'))
+# [
+#     {
+#         'field': [
+#             'sender',
+#             'country'
+#         ],
+#         'value': 'US',
+#         'operation': 'ne'
+#     }
+# ]
+
+```
+_(This script is complete, it should run "as is")_
+
+Also, by default unknown fields are ignored, but you can change this behavior by passing `False` to the constructor
+parameter `ignore_unknown_name`.
+
+```Python  hl_lines="9"
+from pydantic import BaseModel
+from filterify import Filterify
+
+
+class User(BaseModel):
+    name: str
+
+
+model_filter = Filterify(User, ignore_unknown_name=False)
+
+print(model_filter('sender=US'))
+# filterify.exceptions.UnknownFieldError: Filter name is not presented in the model: sender
+
+```
+_(This script is complete, it should run "as is")_
+
+## Ordering option
+
+You can add an `ordering` field that accepts all model field names. Currently, it's used a django-like style when desc
+is passed as `-field_name`.
+
+```Python  hl_lines="14"
+from pydantic import BaseModel
+from filterify import Filterify
+
+
+class Address(BaseModel):
+    country: str
+
+
+class Shipment(BaseModel):
+    name: str
+    sender: Address
+
+
+model_filter = Filterify(Shipment, ordering=True)
+
+print(model_filter('ordering=unknown_field'))
+# raises standard pydantic ValidationError with the next message:
+# unexpected value; permitted: 'name', '-name', 'sender__country', '-sender__country'
+
+```
+_(This script is complete, it should run "as is")_
+
+If you want to change the accepted field name list, you can pass a list instead of the `True` value.
+
+```Python  hl_lines="14"
+from pydantic import BaseModel
+from filterify import Filterify
+
+
+class Address(BaseModel):
+    country: str
+
+
+class Shipment(BaseModel):
+    name: str
+    sender: Address
+
+
+model_filter = Filterify(Shipment, ordering=['name'])
+
+print(model_filter('ordering=unknown_field'))
+# raises standard pydantic ValidationError with the next message:
+# unexpected value; permitted: 'name', '-name'
+
+```
+_(This script is complete, it should run "as is")_
+
+## Usage with FastAPI
+
+Most validation work is done by pydantic, so filterify can be easily used with FastAPI.
+The internal validation model is wrapped by `fastapi.Depends` and exposed by the `as_dependency` method.
+
+```Python  hl_lines="29 35"
+import uvicorn
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from filterify import Filterify
+
+
+class Address(BaseModel):
+    street: str
+    city: str
+    country: str
+
+
+class Shipment(BaseModel):
+    name: str
+    sender: Address
+    recipient: Address
+    weight: float
+    length: float
+    height: float
+
+
+shipment_filter = Filterify(Shipment)
+
+
+app = FastAPI()
+
+
+@app.get('/shipments', dependencies=[shipment_filter.as_dependency()])
+def shipments():
+    return []
+
+
+@app.get('/another_shipments')
+def another_shipments(filters=shipment_filter.as_dependency()):
+    print(filters)
+    return []
+
+
+if __name__ == '__main__':
+    uvicorn.run(app)
+
+```
+_(This script is complete, it should run "as is")_
 
 ## Acknowledgments
 
