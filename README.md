@@ -157,6 +157,20 @@ print(model_filter('sender=US'))
 ```
 _(This script is complete, it should run "as is")_
 
+## Supported types
+
+Currently, filterify supports a small number of types, it will be extended in the future:
+
+| Field type | Available lookups                      |
+|------------|----------------------------------------|
+| str        | `eq`, `ne`, `contains`, `not_contains` |
+| int        | `eq`, `ne`, `gt`, `lt`, `gte`, `lte`   |
+| float      | `eq`, `ne`, `gt`, `lt`, `gte`, `lte`   |
+| bool       | `eq`, `ne`                             |
+| list       | `eq`, `ne`                             |
+
+In the case of an unknown type or lookup, it will be raised `UnknownTypeError` and `UnknownOperationError` exceptions.
+
 ## Ordering option
 
 You can add an `ordering` field that accepts all model field names. Currently, it's used a django-like style when desc
