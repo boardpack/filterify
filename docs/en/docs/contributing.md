@@ -320,18 +320,18 @@ If you look at the Filterify docs website, you will see that every language has 
 
 But when you run it locally like this, you will only see the pages that are already translated.
 
-Now let's say that you want to add a translation for the section [Features](features.md){.internal-link target=_blank}.
+Now let's say that you want to add a translation for the section [Help Filterify - Get Help](help-filterify.md){.internal-link target=_blank}.
 
 * Copy the file at:
 
 ```
-docs/en/docs/features.md
+docs/en/docs/help-filterify.md
 ```
 
 * Paste it in exactly the same location but for the language you want to translate, e.g.:
 
 ```
-docs/ru/docs/features.md
+docs/ru/docs/help-filterify.md
 ```
 
 !!! tip
@@ -343,7 +343,7 @@ docs/ru/docs/features.md
 docs/en/docs/mkdocs.yml
 ```
 
-* Find the place where that `docs/features.md` is located in the config file. Somewhere like:
+* Find the place where that `docs/help-filterify.md` is located in the config file. Somewhere like:
 
 ```YAML hl_lines="8"
 site_name: Filterify
@@ -353,7 +353,7 @@ nav:
 - Languages:
   - en: /
   - ru: /ru/
-- features.md
+- help-filterify.md
 ```
 
 * Open the MkDocs config file for the language you are editing, e.g.:
@@ -372,7 +372,7 @@ nav:
 - Languages:
   - en: /
   - ru: /ru/
-- features.md
+- help-filterify.md
 ```
 
 Make sure that if there are other entries, the new entry with your translation is exactly in the same order as in the English version.

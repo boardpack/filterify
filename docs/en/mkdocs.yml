@@ -36,8 +36,6 @@ nav:
 - Filterify: index.md
 - Languages:
   - English: /
-  - Русский: /ru/
-- features.md
 - help-filterify.md
 - contributing.md
 - release-notes.md
@@ -68,8 +66,6 @@ extra:
   alternate:
   - link: /
     name: English
-  - link: /ru/
-    name: Русский
 extra_css:
 - css/termynal.css
 - css/custom.css

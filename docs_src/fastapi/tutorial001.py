@@ -1,5 +1,3 @@
-from typing import List
-
 import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -20,7 +18,6 @@ class Shipment(BaseModel):
     weight: float
     length: float
     height: float
-    packages: List[str]
 
 
 shipment_filter = Filterify(Shipment)
@@ -31,6 +28,12 @@ app = FastAPI()
 
 @app.get('/shipments', dependencies=[shipment_filter.as_dependency()])
 def shipments():
+    return []
+
+
+@app.get('/another_shipments')
+def another_shipments(filters=shipment_filter.as_dependency()):
+    print(filters)
     return []
 
 

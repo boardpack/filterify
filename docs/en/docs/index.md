@@ -30,6 +30,10 @@
 
 Python 3.8+
 
+filterify has the next dependencies:
+
+* <a href="https://pydantic-docs.helpmanual.io/" class="external-link" target="_blank">Pydantic</a>
+
 ## Installation
 
 <div class="termy">
@@ -41,6 +45,62 @@ $ pip install filterify
 ```
 
 </div>
+
+## First steps
+
+To start to work with filterify, you just need to have some Pydantic model you want to have as filters.
+
+Let's define simple `Address` and `Shipment` models. Then just pass the `Shipment` model to the `Filterify` constructor
+and you will get a callable object to parse query params. By default, the parser returns a dictionary structure with
+the parsing results.
+
+```Python  hl_lines="18 20"
+{!../../../docs_src/first-steps/tutorial001.py!}
+```
+_(This script is complete, it should run "as is")_
+
+Filterify supports nested models and uses `__` as a delimiter for the nested models and operations. If you want to
+change it, pass the needed `delimiter` to the constructor as it's shown in the next example.
+
+```Python  hl_lines="13"
+{!../../../docs_src/first-steps/tutorial002.py!}
+```
+_(This script is complete, it should run "as is")_
+
+Also, by default unknown fields are ignored, but you can change this behavior by passing `False` to the constructor
+parameter `ignore_unknown_name`.
+
+```Python  hl_lines="9"
+{!../../../docs_src/first-steps/tutorial003.py!}
+```
+_(This script is complete, it should run "as is")_
+
+## Ordering option
+
+You can add an `ordering` field that accepts all model field names. Currently, it's used a django-like style when desc
+is passed as `-field_name`.
+
+```Python  hl_lines="14"
+{!../../../docs_src/ordering/tutorial001.py!}
+```
+_(This script is complete, it should run "as is")_
+
+If you want to change the accepted field name list, you can pass a list instead of the `True` value.
+
+```Python  hl_lines="14"
+{!../../../docs_src/ordering/tutorial002.py!}
+```
+_(This script is complete, it should run "as is")_
+
+## Usage with FastAPI
+
+Most validation work is done by pydantic, so filterify can be easily used with FastAPI.
+The internal validation model is wrapped by `fastapi.Depends` and exposed by the `as_dependency` method.
+
+```Python  hl_lines="29 35"
+{!../../../docs_src/fastapi/tutorial001.py!}
+```
+_(This script is complete, it should run "as is")_
 
 ## Acknowledgments
 
