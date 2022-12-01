@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* ⬆ Bump mkdocs-material from 8.5.10 to 8.5.11. PR [#18](https://github.com/boardpack/filterify/pull/18) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * 📝 Add supported field types. PR [#17](https://github.com/boardpack/filterify/pull/17) by [@dukkee](https://github.com/dukkee).
 * ⬆ Bump actions/upload-artifact from 2 to 3. PR [#16](https://github.com/boardpack/filterify/pull/16) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump nwtgck/actions-netlify from 1.1.5 to 1.2.4. PR [#15](https://github.com/boardpack/filterify/pull/15) by [@dependabot[bot]](https://github.com/apps/dependabot).
