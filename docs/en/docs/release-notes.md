@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* ⬆ Bump black from 22.10.0 to 22.12.0. PR [#20](https://github.com/boardpack/filterify/pull/20) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump nwtgck/actions-netlify from 1.2.4 to 2.0.0. PR [#19](https://github.com/boardpack/filterify/pull/19) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump mkdocs-material from 8.5.10 to 8.5.11. PR [#18](https://github.com/boardpack/filterify/pull/18) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * 📝 Add supported field types. PR [#17](https://github.com/boardpack/filterify/pull/17) by [@dukkee](https://github.com/dukkee).
