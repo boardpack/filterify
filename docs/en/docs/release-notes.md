@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* ⬆ Bump isort from 5.10.1 to 5.11.1. PR [#21](https://github.com/boardpack/filterify/pull/21) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump black from 22.10.0 to 22.12.0. PR [#20](https://github.com/boardpack/filterify/pull/20) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump nwtgck/actions-netlify from 1.2.4 to 2.0.0. PR [#19](https://github.com/boardpack/filterify/pull/19) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump mkdocs-material from 8.5.10 to 8.5.11. PR [#18](https://github.com/boardpack/filterify/pull/18) by [@dependabot[bot]](https://github.com/apps/dependabot).
