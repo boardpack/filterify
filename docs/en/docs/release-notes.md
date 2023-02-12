@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* ⬆ Bump autoflake from 2.0.0 to 2.0.1. PR [#36](https://github.com/boardpack/filterify/pull/36) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump dawidd6/action-download-artifact from 2.24.2 to 2.24.3. PR [#26](https://github.com/boardpack/filterify/pull/26) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump pytest from 7.2.0 to 7.2.1. PR [#31](https://github.com/boardpack/filterify/pull/31) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump black from 22.12.0 to 23.1.0. PR [#37](https://github.com/boardpack/filterify/pull/37) by [@dependabot[bot]](https://github.com/apps/dependabot).
