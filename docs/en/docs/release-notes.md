@@ -2,6 +2,7 @@
 
 ## Latest Changes
 
+* ⬆ Bump mypy from 0.991 to 1.0.1. PR [#45](https://github.com/boardpack/filterify/pull/45) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump markdown-include from 0.8.0 to 0.8.1. PR [#44](https://github.com/boardpack/filterify/pull/44) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump dawidd6/action-download-artifact from 2.24.3 to 2.26.0. PR [#47](https://github.com/boardpack/filterify/pull/47) by [@dependabot[bot]](https://github.com/apps/dependabot).
 * ⬆ Bump isort from 5.11.1 to 5.12.0. PR [#34](https://github.com/boardpack/filterify/pull/34) by [@dependabot[bot]](https://github.com/apps/dependabot).
