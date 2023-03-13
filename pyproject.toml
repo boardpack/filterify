@@ -52,7 +52,7 @@ test = [
     "fastapi",
 ]
 dev = [
-    "autoflake ==2.0.1",
+    "autoflake ==2.0.2",
     "flake8 ==6.0.0",
     "pre-commit",
     "tox >=3.27.1",
